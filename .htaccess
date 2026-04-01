@@ -11,5 +11,8 @@ RewriteRule ^api/(.+)$ backend/public/index.php [QSA,L]
 # Vite static assets (/assets/xxx → frontend/dist/assets/xxx)
 RewriteRule ^assets/(.+)$ frontend/dist/assets/$1 [L]
 
+# Static images (/images/xxx → frontend/dist/images/xxx)
+RewriteRule ^images/(.+)$ frontend/dist/images/$1 [L]
+
 # React SPA — toutes les routes → index.html
 RewriteRule ^ frontend/dist/index.html [L]
