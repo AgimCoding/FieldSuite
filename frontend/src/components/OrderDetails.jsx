@@ -8,10 +8,12 @@ import {
   Hash,
   FileText,
   ListOrdered,
-  ParkingSquare,
   PauseCircle,
   RefreshCw,
-  ArrowRight,
+  Play,
+  CheckCircle,
+  Truck,
+  AlertTriangle,
 } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -53,15 +55,110 @@ function InfoRow({ label, value, highlight }) {
   )
 }
 
-const actionButtons = [
-  { icon: ListOrdered,  label: 'Ordres',         id: 'orders',    color: 'text-brand-700'   },
-  { icon: ParkingSquare, label: 'Parking ordre', id: 'parking',   color: 'text-slate-600'   },
-  { icon: PauseCircle,  label: 'Interrompre',    id: 'interrupt', color: 'text-red-500'     },
-  { icon: RefreshCw,    label: 'Synchroniser',   id: 'sync',      color: 'text-emerald-600' },
-  { icon: ArrowRight,   label: 'Suivant',        id: 'next',      color: 'text-brand-700'   },
-]
+// ─── Action Rail ───────────────────────────────────────────────────────────────
 
-export default function OrderDetails({ task }) {
+function ActionButton({ icon: Icon, label, onClick, variant = 'default', disabled = false }) {
+  const variants = {
+    default:     'bg-slate-50 hover:bg-white text-slate-500 hover:shadow-card',
+    primary:     'bg-brand-700 hover:bg-brand-800 text-white shadow-md',
+    warning:     'bg-amber-500 hover:bg-amber-600 text-white shadow-md',
+    success:     'bg-emerald-500 hover:bg-emerald-600 text-white shadow-md',
+    disabled:    'bg-slate-100 text-slate-300 cursor-not-allowed opacity-60',
+  }
+  const style = disabled ? variants.disabled : variants[variant]
+
+  return (
+    <button
+      onClick={disabled ? undefined : onClick}
+      title={label}
+      className={clsx(
+        'flex flex-col items-center justify-center w-full rounded-2xl py-6 px-2 gap-3 transition-all duration-150 text-center min-h-[100px]',
+        style,
+      )}
+    >
+      <Icon size={36} strokeWidth={1.8} />
+      <span className="text-sm font-semibold leading-tight">{label}</span>
+    </button>
+  )
+}
+
+function ActionRail({ task, activeTaskId, onTaskAction }) {
+  const isThisStarted   = task.status === 'started'
+  const isAnotherActive = activeTaskId !== null && activeTaskId !== task.id
+  const isFinished      = task.status === 'done'
+
+  const [blocked, setBlocked] = useState(false)
+
+  const handleStart = () => {
+    if (isAnotherActive) {
+      setBlocked(true)
+      setTimeout(() => setBlocked(false), 3000)
+      return
+    }
+    onTaskAction('start', task)
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-2 w-40 bg-slate-50 border-l border-slate-200 py-4 px-2 shrink-0">
+
+      {/* Alert: autre tâche en cours */}
+      {blocked && (
+        <div className="w-full bg-amber-50 border border-amber-200 rounded-xl px-2 py-2 mb-1 flex items-start gap-1.5">
+          <AlertTriangle size={14} className="text-amber-500 shrink-0 mt-0.5" />
+          <span className="text-xs text-amber-700 font-medium leading-tight">
+            Mettez la tâche en cours en pause d'abord
+          </span>
+        </div>
+      )}
+
+      {isFinished ? (
+        /* Tâche terminée */
+        <>
+          <ActionButton icon={CheckCircle} label="Terminé" variant="success" disabled />
+          <ActionButton icon={ListOrdered} label="Ordres" variant="default" />
+          <ActionButton icon={RefreshCw}   label="Synchroniser" variant="default" />
+          <ActionButton icon={Truck}       label="En route" variant="default" />
+        </>
+      ) : isThisStarted ? (
+        /* Tâche en cours → montrer Interrompre + Terminer */
+        <>
+          <ActionButton
+            icon={PauseCircle}
+            label="Interrompre"
+            variant="warning"
+            onClick={() => onTaskAction('pause', task)}
+          />
+          <ActionButton
+            icon={CheckCircle}
+            label="Terminer"
+            variant="success"
+            onClick={() => onTaskAction('finish', task)}
+          />
+          <ActionButton icon={ListOrdered} label="Ordres" variant="default" />
+          <ActionButton icon={RefreshCw}   label="Synchroniser" variant="default" />
+        </>
+      ) : (
+        /* Tâche non commencée */
+        <>
+          <ActionButton
+            icon={Play}
+            label="Commencer"
+            variant={isAnotherActive ? 'disabled' : 'primary'}
+            disabled={isAnotherActive}
+            onClick={handleStart}
+          />
+          <ActionButton icon={ListOrdered} label="Ordres" variant="default" />
+          <ActionButton icon={RefreshCw}   label="Synchroniser" variant="default" />
+          <ActionButton icon={Truck}       label="En route" variant="default" />
+        </>
+      )}
+    </div>
+  )
+}
+
+// ─── Main component ────────────────────────────────────────────────────────────
+
+export default function OrderDetails({ task, activeTaskId, onTaskAction }) {
   if (!task || task.status === 'home') {
     return (
       <div className="flex-1 flex items-center justify-center bg-white">
@@ -77,6 +174,7 @@ export default function OrderDetails({ task }) {
     <div className="flex flex-1 min-w-0 overflow-hidden">
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden bg-white">
+
         {/* Header */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-200 bg-white">
           <div>
@@ -85,7 +183,17 @@ export default function OrderDetails({ task }) {
               <p className="text-xs text-slate-400 mt-0.5">{task.orderId}</p>
             )}
           </div>
-          {task.state && (
+          {task.status === 'started' && (
+            <span className="ml-auto text-xs font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 border border-amber-200 animate-pulse">
+              En cours
+            </span>
+          )}
+          {task.status === 'done' && (
+            <span className="ml-auto text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">
+              Terminé
+            </span>
+          )}
+          {task.status === 'pending' && task.state && (
             <span className={clsx('ml-auto text-xs font-bold px-2.5 py-1 rounded-full', statusStyle[task.state] || statusStyle['En attente'])}>
               {task.state}
             </span>
@@ -95,7 +203,6 @@ export default function OrderDetails({ task }) {
         {/* Scrollable body */}
         <div className="flex-1 overflow-y-auto px-3 py-3">
 
-          {/* Détail de l'ordre */}
           <Section title="Détail de l'ordre" icon={FileText}>
             <InfoRow label="No d'ordre"   value={task.orderId}   highlight />
             <InfoRow label="Type d'ordre" value={task.orderType} />
@@ -110,11 +217,10 @@ export default function OrderDetails({ task }) {
             )}
             <InfoRow label="Contact" value={task.contact} />
             {task.phone && (
-              <div className="flex gap-2 py-1.5 border-b border-slate-100 items-center">
+              <div className="flex gap-2 py-2 border-b border-slate-100 items-center">
                 <span className="text-sm text-slate-500 w-32 shrink-0">Numéro téléphone</span>
                 <a href={`tel:${task.phone}`} className="text-sm font-semibold text-brand-600 hover:underline flex items-center gap-1.5">
-                  <Phone size={14} />
-                  {task.phone}
+                  <Phone size={14} />{task.phone}
                 </a>
               </div>
             )}
@@ -128,14 +234,12 @@ export default function OrderDetails({ task }) {
               <div className="flex gap-2 py-2 items-center">
                 <span className="text-sm text-slate-500 w-32 shrink-0">E-mail</span>
                 <a href={`mailto:${task.email}`} className="text-sm font-semibold text-brand-600 hover:underline flex items-center gap-1.5">
-                  <Mail size={14} />
-                  {task.email}
+                  <Mail size={14} />{task.email}
                 </a>
               </div>
             )}
           </Section>
 
-          {/* Properties */}
           {(task.jobNr || task.subject) && (
             <Section title="Properties" icon={Tag}>
               <InfoRow label="Jobnr."  value={task.jobNr} />
@@ -143,7 +247,6 @@ export default function OrderDetails({ task }) {
             </Section>
           )}
 
-          {/* Articles réservés */}
           {task.articles && task.articles.length > 0 && (
             <Section title="Articles réservés" icon={Package}>
               <div className="overflow-x-auto -mx-1">
@@ -171,7 +274,6 @@ export default function OrderDetails({ task }) {
             </Section>
           )}
 
-          {/* Détails de l'objet */}
           {task.objectDetails && (
             <Section title="Détails de l'objet" icon={Hash}>
               <InfoRow label="Code"         value={task.objectDetails.code} />
@@ -185,18 +287,7 @@ export default function OrderDetails({ task }) {
       </div>
 
       {/* Right action rail */}
-      <div className="flex flex-col items-center gap-2 w-40 bg-slate-50 border-l border-slate-200 py-4 px-2 shrink-0">
-        {actionButtons.map(({ icon: Icon, label, id, color }) => (
-          <button
-            key={id}
-            title={label}
-            className="flex flex-col items-center justify-center w-full rounded-2xl py-6 px-2 gap-3 hover:bg-white hover:shadow-card transition-all duration-150 text-center min-h-[100px]"
-          >
-            <Icon size={36} className={color} strokeWidth={1.8} />
-            <span className="text-sm text-slate-500 font-semibold leading-tight">{label}</span>
-          </button>
-        ))}
-      </div>
+      <ActionRail task={task} activeTaskId={activeTaskId} onTaskAction={onTaskAction} />
     </div>
   )
 }
