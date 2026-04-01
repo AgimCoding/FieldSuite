@@ -124,7 +124,7 @@ export default function TaskList({ tasks, selectedTask, onSelectTask, searchQuer
   )
 
   return (
-    <div className="flex flex-col w-80 shrink-0 bg-slate-50 border-r border-slate-200 overflow-hidden">
+    <div className="flex flex-col w-[440px] shrink-0 bg-slate-50 border-r border-slate-200 overflow-hidden">
       {/* Search bar */}
       <div className="p-3 border-b border-slate-200 bg-white">
         <div className="relative">
