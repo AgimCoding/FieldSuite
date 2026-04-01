@@ -21,27 +21,27 @@ const navItems = [
 
 export default function Sidebar({ activeNav, onNavChange }) {
   return (
-    <aside className="flex flex-col items-center w-24 bg-white border-r border-slate-200 shadow-sm py-4 gap-1 shrink-0">
+    <aside className="flex flex-col items-center w-40 bg-white border-r border-slate-200 shadow-sm py-4 gap-1 shrink-0">
       {/* Logo */}
       <div className="mb-5 flex items-center justify-center w-12 h-12 rounded-xl bg-brand-700">
         <span className="text-white font-bold text-base">FS</span>
       </div>
 
-      <div className="flex flex-col items-center gap-1.5 w-full px-2">
+      <div className="flex flex-col items-center gap-2 w-full px-2">
         {navItems.map(({ icon: Icon, label, id }) => (
           <button
             key={id}
             onClick={() => onNavChange(id)}
             title={label}
             className={clsx(
-              'group flex flex-col items-center justify-center w-full rounded-xl py-3.5 px-1 gap-1 transition-all duration-150 min-h-[64px]',
+              'group flex flex-col items-center justify-center w-full rounded-2xl py-6 px-2 gap-3 transition-all duration-150 min-h-[100px]',
               activeNav === id
                 ? 'bg-brand-50 text-brand-700'
                 : 'text-slate-500 hover:bg-slate-50 hover:text-brand-700',
             )}
           >
-            <Icon size={26} strokeWidth={activeNav === id ? 2.2 : 1.8} />
-            <span className="text-[11px] font-medium leading-tight text-center">{label}</span>
+            <Icon size={36} strokeWidth={activeNav === id ? 2.2 : 1.8} />
+            <span className="text-sm font-semibold leading-tight text-center">{label}</span>
           </button>
         ))}
       </div>
