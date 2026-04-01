@@ -8,6 +8,7 @@ import {
   Home,
 } from 'lucide-react'
 import clsx from 'clsx'
+import MotracLogo from './MotracLogo'
 
 const navItems = [
   { icon: SlidersHorizontal, label: 'Filtre',         id: 'filter'   },
@@ -23,8 +24,8 @@ export default function Sidebar({ activeNav, onNavChange }) {
   return (
     <aside className="flex flex-col items-center w-40 bg-white border-r border-slate-200 shadow-sm py-4 gap-1 shrink-0">
       {/* Logo */}
-      <div className="mb-5 flex items-center justify-center w-12 h-12 rounded-xl bg-brand-700">
-        <span className="text-white font-bold text-base">FS</span>
+      <div className="mb-4 flex items-center justify-center px-2">
+        <MotracLogo width={136} height={40} />
       </div>
 
       <div className="flex flex-col items-center gap-2 w-full px-2">
