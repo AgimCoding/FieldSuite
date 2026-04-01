@@ -185,15 +185,15 @@ export default function OrderDetails({ task }) {
       </div>
 
       {/* Right action rail */}
-      <div className="flex flex-col items-center gap-2 w-20 bg-slate-50 border-l border-slate-200 py-4 px-2 shrink-0">
+      <div className="flex flex-col items-center gap-2 w-28 bg-slate-50 border-l border-slate-200 py-4 px-2 shrink-0">
         {actionButtons.map(({ icon: Icon, label, id, color }) => (
           <button
             key={id}
             title={label}
-            className="flex flex-col items-center justify-center w-full rounded-xl py-4 px-1 gap-1.5 hover:bg-white hover:shadow-card transition-all duration-150 text-center min-h-[72px]"
+            className="flex flex-col items-center justify-center w-full rounded-xl py-5 px-2 gap-2 hover:bg-white hover:shadow-card transition-all duration-150 text-center min-h-[84px]"
           >
-            <Icon size={22} className={color} strokeWidth={1.8} />
-            <span className="text-[11px] text-slate-500 font-semibold leading-tight">{label}</span>
+            <Icon size={26} className={color} strokeWidth={1.8} />
+            <span className="text-xs text-slate-500 font-semibold leading-tight">{label}</span>
           </button>
         ))}
       </div>
