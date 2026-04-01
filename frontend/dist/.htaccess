@@ -1,0 +1,10 @@
+RewriteEngine On
+RewriteBase /
+
+# Serve existing files/dirs directly (assets, favicon, etc.)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# React SPA — toutes les routes → index.html
+RewriteRule ^ index.html [L]
