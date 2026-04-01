@@ -25,7 +25,7 @@ export default function Sidebar({ activeNav, onNavChange }) {
     <aside className="flex flex-col items-center w-40 bg-white border-r border-slate-200 shadow-sm py-4 gap-1 shrink-0">
       {/* Logo */}
       <div className="mb-4 flex items-center justify-center px-2">
-        <MotracLogo width={136} height={40} />
+        <MotracLogo style={{ width: '136px', height: 'auto' }} />
       </div>
 
       <div className="flex flex-col items-center gap-2 w-full px-2">

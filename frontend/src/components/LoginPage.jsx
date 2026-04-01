@@ -26,7 +26,7 @@ export default function LoginPage({ onLogin }) {
 
         {/* Header branding */}
         <div className="flex justify-center items-center bg-slate-100 px-8 py-8 border-b border-slate-200">
-          <MotracLogo width={300} height={86} />
+          <MotracLogo style={{ width: '300px', height: 'auto' }} />
         </div>
 
         {/* Form */}
