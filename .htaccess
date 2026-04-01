@@ -1,4 +1,3 @@
-Options -Indexes
 RewriteEngine On
 
 # Serve existing real files/dirs directly
